@@ -15,14 +15,23 @@ export const useAuthStore = create((set, get) => ({
   onlineUsers: [],
 
   checkAuth: async () => {
+    console.log("Checking auth at:", BASE_URL);
+    // Force timeout after 15 seconds so we don't hang forever
+    const timeout = setTimeout(() => {
+      console.warn("Auth check timed out. Proceeding as unauthenticated.");
+      set({ isCheckingAuth: false, authUser: null });
+    }, 15000);
+
     try {
       const res = await axiosInstance.get("/auth/check");
+      console.log("Auth check success:", res.data ? "User found" : "No user");
       set({ authUser: res.data });
       get().connectSocket();
     } catch (error) {
-      console.log("Error in authCheck:", error);
+      console.error("Error in authCheck:", error);
       set({ authUser: null });
     } finally {
+      clearTimeout(timeout);
       set({ isCheckingAuth: false });
     }
   },
