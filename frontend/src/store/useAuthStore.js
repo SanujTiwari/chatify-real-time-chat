@@ -16,11 +16,11 @@ export const useAuthStore = create((set, get) => ({
 
   checkAuth: async () => {
     console.log("Checking auth at:", BASE_URL);
-    // Force timeout after 15 seconds so we don't hang forever
+    // Force timeout after 60 seconds (for Render cold starts)
     const timeout = setTimeout(() => {
       console.warn("Auth check timed out. Proceeding as unauthenticated.");
       set({ isCheckingAuth: false, authUser: null });
-    }, 15000);
+    }, 60000);
 
     try {
       const res = await axiosInstance.get("/auth/check");
