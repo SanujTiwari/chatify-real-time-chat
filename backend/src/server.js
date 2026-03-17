@@ -24,12 +24,26 @@ const PORT = ENV.PORT || 3000
 
 app.use(express.json({ limit: "5mb" }))
 
+// Log requests for debugging
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path} - Origin: ${req.get("origin")}`);
+  next();
+});
+
 // Sanitize CLIENT_URL (remove trailing slash)
 const clientUrl = ENV.CLIENT_URL?.endsWith("/") ? ENV.CLIENT_URL.slice(0, -1) : ENV.CLIENT_URL;
 
 app.use(
   cors({
-    origin: [clientUrl, "http://localhost:5173", "http://localhost:3000"],
+    origin: (origin, callback) => {
+      // Allow if origin is the configured CLIENT_URL, localhost, or if there's no origin (like server-to-server)
+      if (!origin || origin === clientUrl || origin.includes("localhost") || origin.includes("vercel.app")) {
+        callback(null, true);
+      } else {
+        console.error("CORS Blocked for origin:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 )
