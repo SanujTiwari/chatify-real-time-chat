@@ -43,7 +43,9 @@ export const useAuthStore = create((set, get) => ({
       toast.success("OTP sent to your email!");
       navigate("/verify-otp", { state: { email: data.email } });
     } catch (error) {
-      toast.error(error.response?.data?.message || "Signup failed");
+      const errorMsg = error.response?.data?.message || error.message || "Signup failed";
+      toast.error(errorMsg);
+      console.error("Signup failed details:", error);
     } finally {
       set({ isSigningUp: false });
     }
@@ -54,12 +56,11 @@ export const useAuthStore = create((set, get) => ({
     try {
       const res = await axiosInstance.post("/auth/login", data);
       set({ authUser: res.data });
-
       toast.success("Logged in successfully");
-
       get().connectSocket();
     } catch (error) {
-      toast.error(error.response.data.message);
+      const errorMsg = error.response?.data?.message || error.message || "Login failed";
+      toast.error(errorMsg);
     } finally {
       set({ isLoggingIn: false });
     }
