@@ -5,6 +5,17 @@ import ChatHeader from "./ChatHeader";
 import NoChatHistoryPlaceholder from "./NoChatHistoryPlaceholder";
 import MessageInput from "./MessageInput";
 import MessagesLoadingSkeleton from "./MessagesLoadingSkeleton";
+import { THEMES } from "./ThemePicker";
+
+// Map theme id → Tailwind bg class for chat bubbles
+const THEME_BUBBLE_MAP = {
+  cyan: "bg-cyan-600",
+  rose: "bg-rose-600",
+  violet: "bg-violet-600",
+  emerald: "bg-emerald-600",
+  amber: "bg-amber-600",
+  sky: "bg-sky-600",
+};
 
 function ChatContainer() {
   const {
@@ -14,15 +25,16 @@ function ChatContainer() {
     isMessagesLoading,
     subscribeToMessages,
     unsubscribeFromMessages,
+    chatTheme,
   } = useChatStore();
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
 
+  const sentBubbleClass = THEME_BUBBLE_MAP[chatTheme] || "bg-cyan-600";
+
   useEffect(() => {
     getMessagesByUserId(selectedUser._id);
     subscribeToMessages();
-
-    // clean up
     return () => unsubscribeFromMessages();
   }, [selectedUser, getMessagesByUserId, subscribeToMessages, unsubscribeFromMessages]);
 
@@ -44,11 +56,10 @@ function ChatContainer() {
                 className={`chat ${msg.senderId === authUser._id ? "chat-end" : "chat-start"}`}
               >
                 <div
-                  className={`chat-bubble relative ${
-                    msg.senderId === authUser._id
-                      ? "bg-cyan-600 text-white"
+                  className={`chat-bubble relative ${msg.senderId === authUser._id
+                      ? `${sentBubbleClass} text-white`
                       : "bg-slate-800 text-slate-200"
-                  }`}
+                    }`}
                 >
                   {msg.image && (
                     <img src={msg.image} alt="Shared" className="rounded-lg h-48 object-cover" />
@@ -63,7 +74,7 @@ function ChatContainer() {
                 </div>
               </div>
             ))}
-            {/* 👇 scroll target */}
+            {/* scroll target */}
             <div ref={messageEndRef} />
           </div>
         ) : isMessagesLoading ? (
@@ -79,3 +90,4 @@ function ChatContainer() {
 }
 
 export default ChatContainer;
+

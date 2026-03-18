@@ -112,16 +112,31 @@ export const logout = (_, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { profilePic } = req.body;
-    if (!profilePic) return res.status(400).json({ message: "Profile pic is required" });
+    const { profilePic, fullName, bio } = req.body;
+
+    if (!profilePic && !fullName && bio === undefined) {
+      return res.status(400).json({ message: "Nothing to update" });
+    }
 
     const userId = req.user._id;
+    const updateData = {};
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
+    if (profilePic) {
+      const uploadResponse = await cloudinary.uploader.upload(profilePic);
+      updateData.profilePic = uploadResponse.secure_url;
+    }
+
+    if (fullName && fullName.trim()) {
+      updateData.fullName = fullName.trim();
+    }
+
+    if (bio !== undefined) {
+      updateData.bio = bio.trim().slice(0, 150);
+    }
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { profilePic: uploadResponse.secure_url },
+      updateData,
       { new: true }
     );
 
@@ -131,6 +146,7 @@ export const updateProfile = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 export const googleLogin = async (req, res) => {
   const { credential } = req.body;
 

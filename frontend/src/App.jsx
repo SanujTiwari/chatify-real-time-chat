@@ -3,6 +3,7 @@ import ChatPage from "./pages/ChatPage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import VerifyOTP from "./pages/VerifyOTP";
+import ProfilePage from "./pages/ProfilePage";
 import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
 import PageLoader from "./components/PageLoader";
@@ -30,6 +31,7 @@ function App() {
         <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to={"/"} />} />
         <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to={"/"} />} />
         <Route path="/verify-otp" element={!authUser ? <VerifyOTP /> : <Navigate to={"/"} />} />
+        <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to={"/login"} />} />
       </Routes>
 
       <Toaster />

@@ -24,6 +24,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    bio: {
+      type: String,
+      default: "",
+      maxlength: 150,
+    },
     otp: { type: String },
     otpExpires: { type: Date },
     isVerified: {

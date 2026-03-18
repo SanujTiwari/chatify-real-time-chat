@@ -12,6 +12,12 @@ export const useChatStore = create((set, get) => ({
   isUsersLoading: false,
   isMessagesLoading: false,
   isSoundEnabled: JSON.parse(localStorage.getItem("isSoundEnabled")) === true,
+  chatTheme: localStorage.getItem("chatTheme") || "cyan",
+
+  setChatTheme: (theme) => {
+    localStorage.setItem("chatTheme", theme);
+    set({ chatTheme: theme });
+  },
 
   toggleSound: () => {
     localStorage.setItem("isSoundEnabled", !get().isSoundEnabled);
